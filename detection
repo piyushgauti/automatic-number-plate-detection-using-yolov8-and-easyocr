@@ -1,0 +1,44 @@
+import numpy as np
+from ultralytics import YOLO
+import cv2 as cv
+import python_utils
+import easyocr
+
+
+
+# Load a model
+model = YOLO(r"C:\Users\piyus\PycharmProjects\pythonProject2\runs\detect\train13\weights\best.pt")  # pretrained YOLOv8n model
+
+# Run batched inference on a list of images
+results = model.predict(r"C:\Users\piyus\Downloads\fp2hu_512.jpg")  # return a list of Results objects
+print('results',results)
+print(results[0].boxes)
+
+img = cv.imread(r"C:\Users\piyus\Downloads\fp2hu_512.jpg")
+
+# cv.imshow("window1",img)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
+data = results[0].boxes
+print(type(data))
+points = data.xyxy
+
+print("Point = ",points.tolist()[0])
+
+p2 = points.tolist()[0]
+
+p = []
+for x in p2:
+    p.append(round(x))
+cv.rectangle(img,(p[0],p[1]),(p[2],p[3]),(255,0,0),2)
+cv.imshow("window1",img)
+cv.waitKey(0)
+cropped_image = img[p[1]:p[3], p[0]:p[2]]
+cv.imshow("output",cropped_image)
+cv.waitKey(0)
+reader = easyocr.Reader(['en'])
+Result = reader.readtext(cropped_image, detail=0)
+print(Result)
+
+
+
